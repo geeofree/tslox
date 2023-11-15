@@ -1,0 +1,16 @@
+var str1 = 'str1';
+var str2 = "str2";
+
+var num1 = 123;
+var num2 = 123.456;
+var num2 = 1.s;
+
+var bool1 = true;
+var bool2 = false;
+var bool3 = true and false or false;
+
+fun greet(name) {
+  print("Hello there, " + name + "!");
+}
+
+greet("Loxie");
