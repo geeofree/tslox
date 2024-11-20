@@ -1,0 +1,5 @@
+// Hello world
+func greet(name) {
+  print("Hello {name}")
+}
+let PI = 3.145
