@@ -29,6 +29,9 @@ export const enum TokenTypes {
   SLASH_SLASH = 'SLASH_SLASH',
 
   // KEYWORDS
+  TRUE = 'TRUE',
+  FALSE = 'FALSE',
+  NIL = 'NIL',
   NOT = 'NOT',
   AND = 'AND',
   OR = 'OR',
@@ -48,6 +51,9 @@ export const enum TokenTypes {
 }
 
 export const KeywordMap: Record<string, TokenTypes> = {
+  'true': TokenTypes.TRUE,
+  'false': TokenTypes.FALSE,
+  'nil': TokenTypes.NIL,
   'not': TokenTypes.NOT,
   'and': TokenTypes.AND,
   'or': TokenTypes.OR,
