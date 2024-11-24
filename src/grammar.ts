@@ -1,14 +1,14 @@
 import { Token } from "./token";
 
 export abstract class Expr {
-  abstract accept(visitor: ExprVisitor): void;
+  abstract accept(visitor: ExprVisitor): Object | null;
 }
 
 export abstract class ExprVisitor {
-  abstract visitBinaryExpr(expr: Expr): void;
-  abstract visitUnaryExpr(expr: Expr): void;
-  abstract visitLiteralExpr(expr: Expr): void;
-  abstract visitGroupingExpr(expr: Expr): void;
+  abstract visitBinaryExpr(expr: BinaryExpr): Object | null;
+  abstract visitUnaryExpr(expr: UnaryExpr): Object | null;
+  abstract visitLiteralExpr(expr: LiteralExpr): Object | null;
+  abstract visitGroupingExpr(expr: GroupingExpr): Object | null;
 }
 
 export class BinaryExpr extends Expr {
@@ -23,8 +23,8 @@ export class BinaryExpr extends Expr {
     this.right = right;
   }
 
-  accept(visitor: ExprVisitor): void {
-    visitor.visitBinaryExpr(this);
+  accept(visitor: ExprVisitor): Object | null{
+    return visitor.visitBinaryExpr(this);
   }
 }
 
@@ -38,33 +38,33 @@ export class UnaryExpr extends Expr {
     this.right = right;
   }
 
-  accept(visitor: ExprVisitor): void {
-    visitor.visitUnaryExpr(this);
+  accept(visitor: ExprVisitor): Object | null {
+    return visitor.visitUnaryExpr(this);
   }
 }
 
-export class LiteralExpr<T = unknown> extends Expr {
-  public value: T;
+export class LiteralExpr extends Expr {
+  public value: Object | null;
 
-  constructor(value: T) {
+  constructor(value: Object | null) {
     super();
     this.value = value;
   }
 
-  accept(visitor: ExprVisitor): void {
-    visitor.visitLiteralExpr(this);
+  accept(visitor: ExprVisitor): Object | null {
+    return visitor.visitLiteralExpr(this);
   }
 }
 
 export class GroupingExpr extends Expr {
-  public expr: Expr;
+  public expression: Expr;
 
   constructor(expr: Expr) {
     super();
-    this.expr = expr;
+    this.expression = expr;
   }
 
-  accept(visitor: ExprVisitor): void {
-    visitor.visitGroupingExpr(this);
+  accept(visitor: ExprVisitor): Object | null {
+    return visitor.visitGroupingExpr(this);
   }
 }

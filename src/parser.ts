@@ -82,12 +82,16 @@ export class Parser {
   }
 
   private primary(): Expr {
-    if (this.match(TokenTypes.FALSE)) return new LiteralExpr<false>(false);
-    if (this.match(TokenTypes.TRUE)) return new LiteralExpr<true>(true);
-    if (this.match(TokenTypes.NIL)) return new LiteralExpr<null>(null);
+    if (this.match(TokenTypes.FALSE)) return new LiteralExpr(false);
+    if (this.match(TokenTypes.TRUE)) return new LiteralExpr(true);
+    if (this.match(TokenTypes.NIL)) return new LiteralExpr(null);
 
-    if (this.match(TokenTypes.NUMBER, TokenTypes.STRING)) {
-      return new LiteralExpr<string>(this.previous().literal as string);
+    if (this.match(TokenTypes.STRING)) {
+      return new LiteralExpr(this.previous().literal as string);
+    }
+
+    if (this.match(TokenTypes.NUMBER)) {
+      return new LiteralExpr(Number(this.previous().literal as string));
     }
 
     if (this.match(TokenTypes.O_PAREN)) {
