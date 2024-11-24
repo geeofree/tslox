@@ -92,9 +92,7 @@ export class Parser {
 
     if (this.match(TokenTypes.O_PAREN)) {
       const expr = this.expression();
-      if (this.current().type !== TokenTypes.C_PAREN) {
-        throw new Error('Expected ")" after expression.');
-      }
+      this.consume(TokenTypes.C_PAREN, 'Expected ")" after expression.');
       return new GroupingExpr(expr);
     }
 
@@ -102,7 +100,7 @@ export class Parser {
   }
 
   private match(...tokenTypes: TokenTypes[]): boolean {
-    if (tokenTypes.includes(this.current().type)) {
+    if (!this.isAtEnd() && tokenTypes.includes(this.current().type)) {
       this.advance();
       return true;
     }
@@ -118,6 +116,14 @@ export class Parser {
       this.head += 1;
     }
     return this.tokens[this.head];
+  }
+
+  private consume(tokenType: TokenTypes, message: string): Token {
+    if (this.current().type === tokenType) {
+      return this.advance();
+    }
+
+    throw new Error(message);
   }
 
   private previous(): Token {
