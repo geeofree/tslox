@@ -9,7 +9,7 @@ export class Interpreter {
     const file = await fs.readFile(sourceFile, { encoding: 'utf8' });
     const tokens = new Scanner(file).scan();
     const ast = new Parser(tokens).parse();
-    /* console.log(tokens, util.inspect(ast, { showHidden: false ,depth: null, colors: true })); */
+    console.log(tokens, util.inspect(ast, { showHidden: false ,depth: null, colors: true }));
     if (ast) {
       const value = new Evaluator().evaluate(ast);
       console.log(value);
