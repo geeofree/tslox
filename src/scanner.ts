@@ -103,7 +103,8 @@ export class Scanner {
       case '+': {
         if (this.advance() === '=') {
           this.pushToken({ type: TokenTypes.PLUS_EQUALS });
-          this.head = this.tail;
+          this.head = this.tail + 1;
+          this.tail = this.head;
         } else {
           this.pushToken({ type: TokenTypes.PLUS });
           this.head = this.tail
@@ -114,7 +115,8 @@ export class Scanner {
       case '-': {
         if (this.advance() === '=') {
           this.pushToken({ type: TokenTypes.MINUS_EQUALS });
-          this.head = this.tail;
+          this.head = this.tail + 1;
+          this.tail = this.head;
         } else {
           this.pushToken({ type: TokenTypes.MINUS });
           this.head = this.tail;
@@ -125,7 +127,8 @@ export class Scanner {
       case '*': {
         if (this.advance() === '=') {
           this.pushToken({ type: TokenTypes.STAR_EQUALS });
-          this.head = this.tail;
+          this.head = this.tail + 1;
+          this.tail = this.head;
         } else {
           this.pushToken({ type: TokenTypes.STAR });
           this.head = this.tail;
@@ -136,7 +139,8 @@ export class Scanner {
       case '=': {
         if (this.advance() === '=') {
           this.pushToken({ type: TokenTypes.EQUALS_EQUALS });
-          this.head = this.tail;
+          this.head = this.tail + 1;
+          this.tail = this.head;
         } else {
           this.pushToken({ type: TokenTypes.EQUALS });
           this.head = this.tail;
@@ -147,7 +151,8 @@ export class Scanner {
       case '<': {
         if (this.advance() === '=') {
           this.pushToken({ type: TokenTypes.LTE });
-          this.head = this.tail;
+          this.head = this.tail + 1;
+          this.tail = this.head;
         } else {
           this.pushToken({ type: TokenTypes.LT });
           this.head = this.tail;
@@ -158,7 +163,8 @@ export class Scanner {
       case '>': {
         if (this.advance() === '=') {
           this.pushToken({ type: TokenTypes.GTE });
-          this.head = this.tail;
+          this.head = this.tail + 1;
+          this.tail = this.head;
         } else {
           this.pushToken({ type: TokenTypes.GT });
           this.head = this.tail;
@@ -174,13 +180,15 @@ export class Scanner {
               type: TokenTypes.SLASH_SLASH,
               literal: this.getLiteral(),
             });
-            this.head = this.tail;
+            this.head = this.tail + 1;
+            this.tail = this.head;
             break;
           }
 
           case '=': {
             this.pushToken({ type: TokenTypes.SLASH_EQUALS });
-            this.head = this.tail;
+            this.head = this.tail + 1;
+            this.tail = this.head;
             break;
           }
 
