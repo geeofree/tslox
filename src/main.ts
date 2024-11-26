@@ -1,9 +1,9 @@
-import { Interpreter } from "./interpreter";
+import { Lox } from "./lox";
 
 const [_, __, sourceFile] = process.argv
 
 if (sourceFile) {
-  Interpreter.runFile(sourceFile);
+  Lox.runFile(sourceFile);
 } else {
-  Interpreter.runRepl();
+  Lox.runRepl();
 }
