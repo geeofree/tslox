@@ -44,6 +44,7 @@ export const enum TokenTypes {
   LET = 'LET',
   FUNC = 'FUNC',
   IDENT = 'IDENT',
+  PRINT = 'PRINT',
 
   // LITERALS
   STRING = 'STRING',
@@ -65,6 +66,7 @@ export const KeywordMap: Record<string, TokenTypes> = {
   'in': TokenTypes.IN,
   'let': TokenTypes.LET,
   'func': TokenTypes.FUNC,
+  'print': TokenTypes.PRINT,
 }
 
 export type TokenConfig = {
