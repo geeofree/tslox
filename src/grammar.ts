@@ -11,6 +11,15 @@ export abstract class ExprVisitor {
   abstract visitGroupingExpr(expr: GroupingExpr): Object | null;
 }
 
+export abstract class Stmt {
+  abstract accept(visitor: StmtVisitor): void;
+}
+
+export abstract class StmtVisitor {
+  abstract visitExprStmt(stmt: ExprStmt): void;
+  abstract visitPrintStmt(stmt: PrintStmt): void;
+}
+
 export class BinaryExpr extends Expr {
   public left: Expr;
   public operator: Token;
@@ -66,5 +75,31 @@ export class GroupingExpr extends Expr {
 
   accept(visitor: ExprVisitor): Object | null {
     return visitor.visitGroupingExpr(this);
+  }
+}
+
+export class ExprStmt extends Stmt {
+  public expression: Expr;
+
+  constructor(expr: Expr) {
+    super();
+    this.expression = expr;
+  }
+
+  accept(visitor: StmtVisitor): void {
+    visitor.visitExprStmt(this);
+  }
+}
+
+export class PrintStmt extends Stmt {
+  public expression: Expr;
+
+  constructor(expr: Expr) {
+    super();
+    this.expression = expr;
+  }
+
+  accept(visitor: StmtVisitor): void {
+    visitor.visitPrintStmt(this);
   }
 }

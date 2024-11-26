@@ -1,9 +1,15 @@
-import { BinaryExpr, Expr, ExprVisitor, GroupingExpr, LiteralExpr, UnaryExpr } from "./grammar";
+import { BinaryExpr, Expr, ExprStmt, ExprVisitor, GroupingExpr, LiteralExpr, PrintStmt, Stmt, StmtVisitor, UnaryExpr } from "./grammar";
 import { TokenTypes } from "./token";
 
-export class Evaluator extends ExprVisitor {
-  evaluate(expr: Expr): Object | null {
-    return this.eval(expr);
+export class Evaluator implements ExprVisitor, StmtVisitor {
+  evaluate(statements: Stmt[]) {
+    try {
+      statements.forEach(statement => {
+        this.execute(statement);
+      });
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   visitUnaryExpr(expr: UnaryExpr) {
@@ -72,8 +78,23 @@ export class Evaluator extends ExprVisitor {
     return expr.value as null;
   }
 
+  visitExprStmt(stmt: ExprStmt): Object | null {
+    this.eval(stmt.expression);
+    return null;
+  }
+
+  visitPrintStmt(stmt: PrintStmt): Object | null {
+    const value = this.eval(stmt.expression);
+    console.log(value);
+    return null;
+  }
+
   private eval(expr: Expr): Object | null {
     return expr.accept(this);
+  }
+
+  private execute(statement: Stmt): void {
+    statement.accept(this);
   }
 
   private isTruthy(object: Object | null) {

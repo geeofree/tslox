@@ -1,4 +1,4 @@
-import { BinaryExpr, Expr, GroupingExpr, LiteralExpr, UnaryExpr } from "./grammar";
+import { BinaryExpr, Expr, ExprStmt, GroupingExpr, LiteralExpr, PrintStmt, Stmt, UnaryExpr } from "./grammar";
 import { Token, TokenTypes } from "./token";
 
 export class Parser {
@@ -10,13 +10,35 @@ export class Parser {
     this.head = 0;
   }
 
-  public parse(): Expr | null {
+  public parse(): Stmt[] | null {
     try {
-      return this.expression();
+      const statements: Stmt[] = [];
+      while (!this.isAtEnd()) {
+        statements.push(this.statement());
+      }
+      return statements;
     } catch (error) {
       console.error(error);
       return null;
     }
+  }
+
+  private statement(): Stmt {
+    if (this.match(TokenTypes.PRINT)) {
+      return this.printStatement();
+    }
+
+    return this.expressionStatement();
+  }
+
+  private printStatement(): Stmt {
+    const expr: Expr = this.expression();
+    return new PrintStmt(expr);
+  }
+
+  private expressionStatement(): Stmt {
+    const expr: Expr = this.expression();
+    return new ExprStmt(expr);
   }
 
   private expression(): Expr {
