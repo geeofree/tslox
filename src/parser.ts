@@ -1,4 +1,4 @@
-import { BinaryExpr, Expr, ExprStmt, GroupingExpr, LiteralExpr, PrintStmt, Stmt, UnaryExpr, VarDeclStmt, VariableExpr } from "./grammar";
+import { AssignmentExpr, BinaryExpr, Expr, ExprStmt, GroupingExpr, LiteralExpr, PrintStmt, Stmt, UnaryExpr, VarDeclStmt, VariableExpr } from "./grammar";
 import { Token, TokenTypes } from "./token";
 
 export class Parser {
@@ -61,7 +61,23 @@ export class Parser {
   }
 
   private expression(): Expr {
-    return this.equality();
+    return this.assignment();
+  }
+
+  private assignment(): Expr {
+    const expr: Expr = this.equality();
+
+    if (this.match(TokenTypes.EQUALS)) {
+      const value: Expr = this.assignment();
+
+      if (expr instanceof VariableExpr) {
+        return new AssignmentExpr(expr.name, value);
+      }
+
+      throw new Error("Invalid assignment target.");
+    }
+
+    return expr;
   }
 
   private equality(): Expr {

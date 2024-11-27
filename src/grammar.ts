@@ -10,6 +10,7 @@ export abstract class ExprVisitor {
   abstract visitLiteralExpr(expr: LiteralExpr): Object | null;
   abstract visitGroupingExpr(expr: GroupingExpr): Object | null;
   abstract visitVarExpr(expr: VariableExpr): Object | null;
+  abstract visitAssignmentExpr(expr: AssignmentExpr): Object | null;
 }
 
 export abstract class Stmt {
@@ -90,6 +91,21 @@ export class VariableExpr extends Expr {
 
   accept(visitor: ExprVisitor): Object | null {
     return visitor.visitVarExpr(this);
+  }
+}
+
+export class AssignmentExpr extends Expr {
+  public name: Token;
+  public value: Expr;
+
+  constructor(name: Token, value: Expr) {
+    super();
+    this.name = name;
+    this.value = value;
+  }
+
+  accept(visitor: ExprVisitor): Object | null {
+    return visitor.visitAssignmentExpr(this);
   }
 }
 

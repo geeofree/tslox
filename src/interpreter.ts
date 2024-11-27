@@ -1,14 +1,14 @@
-import { BinaryExpr, Expr, ExprStmt, ExprVisitor, GroupingExpr, LiteralExpr, PrintStmt, Stmt, StmtVisitor, UnaryExpr, VarDeclStmt, VariableExpr } from "./grammar";
+import { AssignmentExpr, BinaryExpr, Expr, ExprStmt, ExprVisitor, GroupingExpr, LiteralExpr, PrintStmt, Stmt, StmtVisitor, UnaryExpr, VarDeclStmt, VariableExpr } from "./grammar";
 import { Environment } from "./environment";
 import { TokenTypes } from "./token";
 
 export class Interpreter implements ExprVisitor, StmtVisitor {
   public statements: Stmt[];
-  public environment: Environment;
+  public environment: typeof Environment;
 
   constructor(statements: Stmt[]) {
     this.statements = statements;
-    this.environment = new Environment();
+    this.environment = Environment;
   }
 
   interpret() {
@@ -87,6 +87,23 @@ export class Interpreter implements ExprVisitor, StmtVisitor {
     return expr.value as null;
   }
 
+  visitVarExpr(expr: VariableExpr): Object | null {
+    if (expr.name.literal) {
+      return this.environment.get(expr.name.literal) ?? null;
+    }
+    return null;
+  }
+
+  visitAssignmentExpr(expr: AssignmentExpr): Object | null {
+    if (expr.name.literal && this.environment.has(expr.name.literal)) {
+      const value = this.eval(expr.value);
+      this.environment.set(expr.name.literal, value);
+      return value;
+    }
+
+    return null;
+  }
+
   visitExprStmt(stmt: ExprStmt): Object | null {
     this.eval(stmt.expression);
     return null;
@@ -98,13 +115,6 @@ export class Interpreter implements ExprVisitor, StmtVisitor {
     return null;
   }
 
-  visitVarExpr(expr: VariableExpr): Object | null {
-    if (expr.name.literal) {
-      return this.environment.get(expr.name.literal)
-    }
-    return null;
-  }
-
   visitVarDeclStmt(stmt: VarDeclStmt): void {
     let value: Object | null = null;
     if (stmt.initializer !== null) {
@@ -112,7 +122,7 @@ export class Interpreter implements ExprVisitor, StmtVisitor {
     }
 
     if (stmt.name.literal) {
-      this.environment.add(stmt.name.literal, value);
+      this.environment.set(stmt.name.literal, value);
     }
   }
 
