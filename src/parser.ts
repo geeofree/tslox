@@ -115,7 +115,7 @@ export class Parser {
   private unary(): Expr {
     if (this.match(TokenTypes.NOT, TokenTypes.MINUS)) {
       const operator: Token = this.previous();
-      const right: Expr = this.unary();
+      const right: Expr = this.expression();
       return new UnaryExpr(operator, right);
     }
 
