@@ -1,4 +1,4 @@
-import { BinaryExpr, Expr, ExprStmt, GroupingExpr, LiteralExpr, PrintStmt, Stmt, UnaryExpr } from "./grammar";
+import { BinaryExpr, Expr, ExprStmt, GroupingExpr, LiteralExpr, PrintStmt, Stmt, UnaryExpr, VarDeclStmt, VariableExpr } from "./grammar";
 import { Token, TokenTypes } from "./token";
 
 export class Parser {
@@ -14,13 +14,32 @@ export class Parser {
     try {
       const statements: Stmt[] = [];
       while (!this.isAtEnd()) {
-        statements.push(this.statement());
+        statements.push(this.declaration());
       }
       return statements;
     } catch (error) {
       console.error(error);
       return null;
     }
+  }
+
+  private declaration(): Stmt {
+    if (this.match(TokenTypes.LET)) {
+      return this.varDeclaration();
+    }
+
+    return this.statement();
+  }
+
+  private varDeclaration(): Stmt {
+    const name = this.consume(TokenTypes.IDENT, "Variable declaration must have identifier.");
+
+    let initializer: Expr | null = null;
+    if (this.match(TokenTypes.EQUALS)) {
+      initializer = this.expression();
+    }
+
+    return new VarDeclStmt(name, initializer);
   }
 
   private statement(): Stmt {
@@ -116,6 +135,10 @@ export class Parser {
       return new LiteralExpr(Number(this.previous().literal as string));
     }
 
+    if (this.match(TokenTypes.IDENT)) {
+      return new VariableExpr(this.previous());
+    }
+
     if (this.match(TokenTypes.O_PAREN)) {
       const expr = this.expression();
       this.consume(TokenTypes.C_PAREN, 'Expected ")" after expression.');
@@ -146,7 +169,8 @@ export class Parser {
 
   private consume(tokenType: TokenTypes, message: string): Token {
     if (this.current().type === tokenType) {
-      return this.advance();
+      this.advance();
+      return this.previous();
     }
 
     throw new Error(message);

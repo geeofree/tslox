@@ -1,4 +1,7 @@
-print "one"
-print true
-print 2 + 1
-print 2 == 2
+let a = 1
+let b = 2
+print a + b
+
+let a = 5
+let b = 5
+print a == b

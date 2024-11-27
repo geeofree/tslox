@@ -9,6 +9,7 @@ export abstract class ExprVisitor {
   abstract visitUnaryExpr(expr: UnaryExpr): Object | null;
   abstract visitLiteralExpr(expr: LiteralExpr): Object | null;
   abstract visitGroupingExpr(expr: GroupingExpr): Object | null;
+  abstract visitVarExpr(expr: VariableExpr): Object | null;
 }
 
 export abstract class Stmt {
@@ -18,6 +19,7 @@ export abstract class Stmt {
 export abstract class StmtVisitor {
   abstract visitExprStmt(stmt: ExprStmt): void;
   abstract visitPrintStmt(stmt: PrintStmt): void;
+  abstract visitVarDeclStmt(stmt: VarDeclStmt): void;
 }
 
 export class BinaryExpr extends Expr {
@@ -78,6 +80,19 @@ export class GroupingExpr extends Expr {
   }
 }
 
+export class VariableExpr extends Expr {
+  public name: Token;
+
+  constructor(name: Token) {
+    super();
+    this.name = name;
+  }
+
+  accept(visitor: ExprVisitor): Object | null {
+    return visitor.visitVarExpr(this);
+  }
+}
+
 export class ExprStmt extends Stmt {
   public expression: Expr;
 
@@ -101,5 +116,20 @@ export class PrintStmt extends Stmt {
 
   accept(visitor: StmtVisitor): void {
     visitor.visitPrintStmt(this);
+  }
+}
+
+export class VarDeclStmt extends Stmt {
+  public name: Token;
+  public initializer: Expr | null;
+
+  constructor(name: Token, initializer: Expr | null) {
+    super();
+    this.name = name;
+    this.initializer = initializer;
+  }
+
+  accept(visitor: StmtVisitor): void {
+    visitor.visitVarDeclStmt(this);
   }
 }

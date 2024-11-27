@@ -1,11 +1,14 @@
-import { BinaryExpr, Expr, ExprStmt, ExprVisitor, GroupingExpr, LiteralExpr, PrintStmt, Stmt, StmtVisitor, UnaryExpr } from "./grammar";
+import { BinaryExpr, Expr, ExprStmt, ExprVisitor, GroupingExpr, LiteralExpr, PrintStmt, Stmt, StmtVisitor, UnaryExpr, VarDeclStmt, VariableExpr } from "./grammar";
+import { Environment } from "./environment";
 import { TokenTypes } from "./token";
 
 export class Interpreter implements ExprVisitor, StmtVisitor {
   public statements: Stmt[];
+  public environment: Environment;
 
   constructor(statements: Stmt[]) {
     this.statements = statements;
+    this.environment = new Environment();
   }
 
   interpret() {
@@ -93,6 +96,24 @@ export class Interpreter implements ExprVisitor, StmtVisitor {
     const value = this.eval(stmt.expression);
     console.log(value);
     return null;
+  }
+
+  visitVarExpr(expr: VariableExpr): Object | null {
+    if (expr.name.literal) {
+      return this.environment.get(expr.name.literal)
+    }
+    return null;
+  }
+
+  visitVarDeclStmt(stmt: VarDeclStmt): void {
+    let value: Object | null = null;
+    if (stmt.initializer !== null) {
+      value = this.eval(stmt.initializer);
+    }
+
+    if (stmt.name.literal) {
+      this.environment.add(stmt.name.literal, value);
+    }
   }
 
   private eval(expr: Expr): Object | null {
