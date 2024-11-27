@@ -1,4 +1,4 @@
-import { AssignmentExpr, BinaryExpr, Expr, ExprStmt, GroupingExpr, LiteralExpr, PrintStmt, Stmt, UnaryExpr, VarDeclStmt, VariableExpr } from "./grammar";
+import { AssignmentExpr, BinaryExpr, BlockStmt, Expr, ExprStmt, GroupingExpr, LiteralExpr, PrintStmt, Stmt, UnaryExpr, VarDeclStmt, VariableExpr } from "./grammar";
 import { Token, TokenTypes } from "./token";
 
 export class Parser {
@@ -47,12 +47,28 @@ export class Parser {
       return this.printStatement();
     }
 
+    if (this.match(TokenTypes.O_BRACKET)) {
+      return this.blockStatement();
+    }
+
     return this.expressionStatement();
   }
 
   private printStatement(): Stmt {
     const expr: Expr = this.expression();
     return new PrintStmt(expr);
+  }
+
+  private blockStatement(): Stmt {
+    const statements: Stmt[] = [];
+
+    while (!this.check(TokenTypes.C_BRACKET) && !this.isAtEnd()) {
+      statements.push(this.declaration());
+    }
+
+    this.consume(TokenTypes.C_BRACKET, "Expected '}' after block.");
+
+    return new BlockStmt(statements);
   }
 
   private expressionStatement(): Stmt {
@@ -174,6 +190,10 @@ export class Parser {
 
   private current(): Token {
     return this.tokens[this.head];
+  }
+
+  private check(tokenType: TokenTypes): boolean {
+    return this.current().type === tokenType;
   }
 
   private advance(): Token {

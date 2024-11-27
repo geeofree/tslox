@@ -1,4 +1,4 @@
-import { AssignmentExpr, BinaryExpr, Expr, ExprStmt, ExprVisitor, GroupingExpr, LiteralExpr, PrintStmt, Stmt, StmtVisitor, UnaryExpr, VarDeclStmt, VariableExpr } from "./grammar";
+import { AssignmentExpr, BinaryExpr, BlockStmt, Expr, ExprStmt, ExprVisitor, GroupingExpr, LiteralExpr, PrintStmt, Stmt, StmtVisitor, UnaryExpr, VarDeclStmt, VariableExpr } from "./grammar";
 import { Environment } from "./environment";
 import { TokenTypes } from "./token";
 
@@ -126,12 +126,30 @@ export class Interpreter implements ExprVisitor, StmtVisitor {
     }
   }
 
+  visitBlockStmt(stmt: BlockStmt): void {
+    this.executeBlock(stmt.statements, new Environment(this.environment));
+  }
+
   private eval(expr: Expr): Object | null {
     return expr.accept(this);
   }
 
   private execute(statement: Stmt): void {
     statement.accept(this);
+  }
+
+  private executeBlock(statements: Stmt[], environment: Environment) {
+    const previousEnv: Environment = this.environment;
+
+    this.environment = environment;
+
+    try {
+      statements.forEach((statement) => {
+        this.execute(statement);
+      });
+    } finally {
+      this.environment = previousEnv;
+    }
   }
 
   private isTruthy(object: Object | null) {

@@ -21,6 +21,7 @@ export abstract class StmtVisitor {
   abstract visitExprStmt(stmt: ExprStmt): void;
   abstract visitPrintStmt(stmt: PrintStmt): void;
   abstract visitVarDeclStmt(stmt: VarDeclStmt): void;
+  abstract visitBlockStmt(stmt: BlockStmt): void;
 }
 
 export class BinaryExpr extends Expr {
@@ -147,5 +148,18 @@ export class VarDeclStmt extends Stmt {
 
   accept(visitor: StmtVisitor): void {
     visitor.visitVarDeclStmt(this);
+  }
+}
+
+export class BlockStmt extends Stmt {
+  public statements: Stmt[];
+
+  constructor(statements: Stmt[]) {
+    super();
+    this.statements = statements;
+  }
+
+  accept(visitor: StmtVisitor): void {
+    visitor.visitBlockStmt(this);
   }
 }
