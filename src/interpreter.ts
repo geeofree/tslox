@@ -22,7 +22,7 @@ export class Interpreter implements ExprVisitor, StmtVisitor {
   }
 
   visitUnaryExpr(expr: UnaryExpr) {
-    const operand = this.eval(expr.right);
+    const operand = this.evaluate(expr.right);
 
     switch (expr.operator.type) {
       case TokenTypes.NOT:
@@ -35,8 +35,8 @@ export class Interpreter implements ExprVisitor, StmtVisitor {
   }
 
   visitBinaryExpr(expr: BinaryExpr) {
-    const left = this.eval(expr.left);
-    const right = this.eval(expr.right);
+    const left = this.evaluate(expr.left);
+    const right = this.evaluate(expr.right);
 
     if (typeof left === "string" && typeof right === "string" && expr.operator.type === TokenTypes.PLUS) {
       return left + right;
@@ -72,7 +72,7 @@ export class Interpreter implements ExprVisitor, StmtVisitor {
   }
 
   visitGroupingExpr(expr: GroupingExpr) {
-    return this.eval(expr.expression);
+    return this.evaluate(expr.expression);
   }
 
   visitLiteralExpr(expr: LiteralExpr) {
@@ -96,7 +96,7 @@ export class Interpreter implements ExprVisitor, StmtVisitor {
 
   visitAssignmentExpr(expr: AssignmentExpr): Object | null {
     if (expr.name.literal) {
-      const value = this.eval(expr.value);
+      const value = this.evaluate(expr.value);
       this.environment.assign(expr.name.literal, value);
       return value;
     }
@@ -105,12 +105,12 @@ export class Interpreter implements ExprVisitor, StmtVisitor {
   }
 
   visitExprStmt(stmt: ExprStmt): Object | null {
-    this.eval(stmt.expression);
+    this.evaluate(stmt.expression);
     return null;
   }
 
   visitPrintStmt(stmt: PrintStmt): Object | null {
-    const value = this.eval(stmt.expression);
+    const value = this.evaluate(stmt.expression);
     console.log(value);
     return null;
   }
@@ -118,7 +118,7 @@ export class Interpreter implements ExprVisitor, StmtVisitor {
   visitVarDeclStmt(stmt: VarDeclStmt): void {
     let value: Object | null = null;
     if (stmt.initializer !== null) {
-      value = this.eval(stmt.initializer);
+      value = this.evaluate(stmt.initializer);
     }
 
     if (stmt.name.literal) {
@@ -130,7 +130,7 @@ export class Interpreter implements ExprVisitor, StmtVisitor {
     this.executeBlock(stmt.statements, new Environment(this.environment));
   }
 
-  private eval(expr: Expr): Object | null {
+  private evaluate(expr: Expr): Object | null {
     return expr.accept(this);
   }
 
