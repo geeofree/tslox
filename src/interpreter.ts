@@ -4,11 +4,11 @@ import { TokenTypes } from "./token";
 
 export class Interpreter implements ExprVisitor, StmtVisitor {
   public statements: Stmt[];
-  public environment: typeof Environment;
+  public environment: Environment;
 
   constructor(statements: Stmt[]) {
     this.statements = statements;
-    this.environment = Environment;
+    this.environment = new Environment();
   }
 
   interpret() {
@@ -89,15 +89,15 @@ export class Interpreter implements ExprVisitor, StmtVisitor {
 
   visitVarExpr(expr: VariableExpr): Object | null {
     if (expr.name.literal) {
-      return this.environment.get(expr.name.literal) ?? null;
+      return this.environment.get(expr.name.literal);
     }
     return null;
   }
 
   visitAssignmentExpr(expr: AssignmentExpr): Object | null {
-    if (expr.name.literal && this.environment.has(expr.name.literal)) {
+    if (expr.name.literal) {
       const value = this.eval(expr.value);
-      this.environment.set(expr.name.literal, value);
+      this.environment.assign(expr.name.literal, value);
       return value;
     }
 
