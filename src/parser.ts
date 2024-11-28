@@ -1,4 +1,18 @@
-import { AssignmentExpr, BinaryExpr, BlockStmt, Expr, ExprStmt, GroupingExpr, LiteralExpr, PrintStmt, Stmt, UnaryExpr, VarDeclStmt, VariableExpr } from "./grammar";
+import {
+  AssignmentExpr,
+  BinaryExpr,
+  BlockStmt,
+  Expr,
+  ExprStmt,
+  GroupingExpr,
+  IfStmt,
+  LiteralExpr,
+  PrintStmt,
+  Stmt,
+  UnaryExpr,
+  VarDeclStmt,
+  VariableExpr,
+} from "./grammar";
 import { Token, TokenTypes } from "./token";
 
 export class Parser {

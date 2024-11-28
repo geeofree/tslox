@@ -1,4 +1,20 @@
-import { AssignmentExpr, BinaryExpr, BlockStmt, Expr, ExprStmt, ExprVisitor, GroupingExpr, LiteralExpr, PrintStmt, Stmt, StmtVisitor, UnaryExpr, VarDeclStmt, VariableExpr } from "./grammar";
+import {
+  AssignmentExpr,
+  BinaryExpr,
+  BlockStmt,
+  Expr,
+  ExprStmt,
+  ExprVisitor,
+  GroupingExpr,
+  IfStmt,
+  LiteralExpr,
+  PrintStmt,
+  Stmt,
+  StmtVisitor,
+  UnaryExpr,
+  VarDeclStmt,
+  VariableExpr,
+} from "./grammar";
 import { Environment } from "./environment";
 import { TokenTypes } from "./token";
 
