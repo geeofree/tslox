@@ -15,6 +15,7 @@ import {
   UnaryExpr,
   VarDeclStmt,
   VariableExpr,
+  WhileStmt,
 } from "./grammar";
 import { Environment } from "./environment";
 import { TokenTypes } from "./token";
@@ -166,6 +167,13 @@ export class Interpreter implements ExprVisitor, StmtVisitor {
       this.execute(stmt.thenBranch);
     } else if (stmt.elseBranch !== null) {
       this.execute(stmt.elseBranch);
+    }
+  }
+
+  visitWhileStmt(stmt: WhileStmt): void {
+    if (this.isTruthy(this.evaluate(stmt.condition))) {
+      this.executeBlock(stmt.statements, new Environment(this.environment));
+      this.visitWhileStmt(stmt);
     }
   }
 

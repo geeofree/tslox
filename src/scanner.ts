@@ -51,6 +51,13 @@ export class Scanner {
         break;
       }
 
+      case ';': {
+        this.pushToken({ type: TokenTypes.SEMICOLON });
+        this.head += 1;
+        this.tail = this.head;
+        break;
+      }
+
       case '.': {
         this.pushToken({ type: TokenTypes.DOT });
         this.head += 1;
@@ -249,7 +256,7 @@ export class Scanner {
   }
 
   private chompNumber() {
-    if (this.currentChar() === '0' && this.peek() !== '.') {
+    if (this.currentChar() === '0' && this.peek() !== '.' && this.isNumber(this.peek(2))) {
       // TODO: Provide row and column insights.
       throw new Error('Not a valid number.');
     }
@@ -293,8 +300,8 @@ export class Scanner {
     return this.source[this.tail];
   }
 
-  private peek(): string {
-    return this.source[this.head + 1];
+  private peek(accumulator?: number): string {
+    return this.source[this.head + (typeof accumulator === "number" ? accumulator : 1)];
   }
 
   private currentChar(): string {

@@ -24,6 +24,7 @@ export abstract class StmtVisitor {
   abstract visitVarDeclStmt(stmt: VarDeclStmt): void;
   abstract visitBlockStmt(stmt: BlockStmt): void;
   abstract visitIfStmt(stmt: IfStmt): void;
+  abstract visitWhileStmt(stmt: WhileStmt): void;
 }
 
 export class BinaryExpr extends Expr {
@@ -197,5 +198,20 @@ export class IfStmt extends Stmt {
 
   accept(visitor: StmtVisitor): void {
     visitor.visitIfStmt(this);
+  }
+}
+
+export class WhileStmt extends Stmt {
+  public condition: Expr;
+  public statements: Stmt[];
+
+  constructor(condition: Expr, statements: Stmt[]) {
+    super();
+    this.condition = condition;
+    this.statements = statements;
+  }
+
+  accept(visitor: StmtVisitor): void {
+    visitor.visitWhileStmt(this);
   }
 }

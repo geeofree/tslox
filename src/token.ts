@@ -14,6 +14,7 @@ export const enum TokenTypes {
   C_SBRACKET = 'C_SBRACKET',
   LT = 'LT',
   GT = 'GT',
+  SEMICOLON = 'SEMICOLON',
 
   // BINARY
   PLUS_EQUALS = 'PLUS_EQUALS',
@@ -36,6 +37,7 @@ export const enum TokenTypes {
   AND = 'AND',
   OR = 'OR',
   IS = 'IS',
+  WHILE = 'WHILE',
   FOR = 'FOR',
   IF = 'IF',
   ELIF = 'ELIF',
@@ -60,6 +62,7 @@ export const KeywordMap: Record<string, TokenTypes> = {
   'or': TokenTypes.OR,
   'is': TokenTypes.IS,
   'for': TokenTypes.FOR,
+  'while': TokenTypes.WHILE,
   'if': TokenTypes.IF,
   'elif': TokenTypes.ELIF,
   'else': TokenTypes.ELSE,

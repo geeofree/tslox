@@ -13,6 +13,7 @@ import {
   UnaryExpr,
   VarDeclStmt,
   VariableExpr,
+  WhileStmt,
 } from "./grammar";
 import { Token, TokenTypes } from "./token";
 
@@ -70,6 +71,14 @@ export class Parser {
       return this.ifStatement();
     }
 
+    if (this.match(TokenTypes.FOR)) {
+      return this.forStatement();
+    }
+
+    if (this.match(TokenTypes.WHILE)) {
+      return this.whileStatement();
+    }
+
     return this.expressionStatement();
   }
 
@@ -93,7 +102,7 @@ export class Parser {
   private ifStatement(): Stmt {
     this.consume(TokenTypes.O_PAREN, "if statement requires '('");
     const condition = this.expression();
-    this.consume(TokenTypes.C_PAREN, "if statement requires ')'");
+    this.consume(TokenTypes.C_PAREN, "Expected ')'.");
 
     const thenBranch = this.statement();
     let elseBranch: Stmt | null = null;
@@ -103,6 +112,65 @@ export class Parser {
     }
 
     return new IfStmt(condition, thenBranch, elseBranch);
+  }
+
+  private forStatement(): Stmt {
+    this.consume(TokenTypes.O_PAREN, "Expected '(' after 'for'.");
+
+    let initializer: Stmt | null;
+    if (this.match(TokenTypes.SEMICOLON)) {
+      initializer = null;
+    } else if (this.match(TokenTypes.LET)) {
+      initializer = this.varDeclaration();
+      this.consume(TokenTypes.SEMICOLON, "Expected ';' after initializer");
+    } else {
+      initializer = this.expressionStatement();
+      this.consume(TokenTypes.SEMICOLON, "Expected ';' after initializer");
+    }
+
+    let condition: Expr | null = null;
+    if (!this.check(TokenTypes.SEMICOLON)) {
+      condition = this.expression();
+    }
+    this.consume(TokenTypes.SEMICOLON, "Expected ';' after loop condition.");
+
+    let increment:  Expr | null = null;
+    if (!this.check(TokenTypes.C_PAREN)) {
+      increment = this.expression();
+    }
+    this.consume(TokenTypes.C_PAREN, "Expected ')' after for clause.");
+
+    let body: Stmt = this.statement();
+
+    if (increment !== null) {
+      body = new BlockStmt([body, new ExprStmt(increment)]);
+    }
+
+    if (condition == null) {
+      condition = new LiteralExpr(true);
+    }
+    body = new WhileStmt(condition, [body]);
+
+    if (initializer !== null) {
+      body = new BlockStmt([initializer, body]);
+    }
+
+    return body;
+  }
+
+  private whileStatement(): Stmt {
+    this.consume(TokenTypes.O_PAREN, "while statement requirements '('");
+    const condition = this.expression();
+    this.consume(TokenTypes.C_PAREN, "Expected ')'.");
+    this.consume(TokenTypes.O_BRACKET, "while statement requires '{'");
+
+    let statements: Stmt[] = [];
+    while (!this.check(TokenTypes.C_BRACKET) && !this.isAtEnd()) {
+      statements.push(this.declaration());
+    }
+    this.consume(TokenTypes.C_BRACKET, "Expected '}'");
+
+    return new WhileStmt(condition, statements);
   }
 
   private expressionStatement(): Stmt {
