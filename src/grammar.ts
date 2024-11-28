@@ -11,6 +11,7 @@ export abstract class ExprVisitor {
   abstract visitGroupingExpr(expr: GroupingExpr): Object | null;
   abstract visitVarExpr(expr: VariableExpr): Object | null;
   abstract visitAssignmentExpr(expr: AssignmentExpr): Object | null;
+  abstract visitLogicalExpr(expr: LogicalExpr): Object | null;
 }
 
 export abstract class Stmt {
@@ -22,6 +23,7 @@ export abstract class StmtVisitor {
   abstract visitPrintStmt(stmt: PrintStmt): void;
   abstract visitVarDeclStmt(stmt: VarDeclStmt): void;
   abstract visitBlockStmt(stmt: BlockStmt): void;
+  abstract visitIfStmt(stmt: IfStmt): void;
 }
 
 export class BinaryExpr extends Expr {
@@ -110,6 +112,23 @@ export class AssignmentExpr extends Expr {
   }
 }
 
+export class LogicalExpr extends Expr {
+  public left: Expr;
+  public operator: Token;
+  public right: Expr;
+
+  constructor(left: Expr, operator: Token, right: Expr) {
+    super();
+    this.left = left;
+    this.operator = operator;
+    this.right = right;
+  }
+
+  accept(visitor: ExprVisitor): Object | null {
+    return visitor.visitLogicalExpr(this);
+  }
+}
+
 export class ExprStmt extends Stmt {
   public expression: Expr;
 
@@ -161,5 +180,22 @@ export class BlockStmt extends Stmt {
 
   accept(visitor: StmtVisitor): void {
     visitor.visitBlockStmt(this);
+  }
+}
+
+export class IfStmt extends Stmt {
+  public condition: Expr;
+  public thenBranch: Stmt;
+  public elseBranch: Stmt | null;
+
+  constructor(condition: Expr, thenBranch: Stmt, elseBranch: Stmt | null) {
+    super();
+    this.condition = condition;
+    this.thenBranch = thenBranch;
+    this.elseBranch = elseBranch;
+  }
+
+  accept(visitor: StmtVisitor): void {
+    visitor.visitIfStmt(this);
   }
 }

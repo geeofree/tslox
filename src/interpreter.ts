@@ -8,6 +8,7 @@ import {
   GroupingExpr,
   IfStmt,
   LiteralExpr,
+  LogicalExpr,
   PrintStmt,
   Stmt,
   StmtVisitor,
@@ -120,6 +121,20 @@ export class Interpreter implements ExprVisitor, StmtVisitor {
     return null;
   }
 
+  visitLogicalExpr(expr: LogicalExpr): Object | null {
+    const left = this.evaluate(expr.left);
+    const right = this.evaluate(expr.right);
+
+    switch (expr.operator.type) {
+      case TokenTypes.OR:
+        return this.isTruthy(left) || this.isTruthy(right);
+      case TokenTypes.AND:
+        return this.isTruthy(left) && this.isTruthy(right);
+      default:
+        return false
+    }
+  }
+
   visitExprStmt(stmt: ExprStmt): Object | null {
     this.evaluate(stmt.expression);
     return null;
@@ -144,6 +159,14 @@ export class Interpreter implements ExprVisitor, StmtVisitor {
 
   visitBlockStmt(stmt: BlockStmt): void {
     this.executeBlock(stmt.statements, new Environment(this.environment));
+  }
+
+  visitIfStmt(stmt: IfStmt): void {
+    if (this.isTruthy(this.evaluate(stmt.condition))) {
+      this.execute(stmt.thenBranch);
+    } else if (stmt.elseBranch !== null) {
+      this.execute(stmt.elseBranch);
+    }
   }
 
   private evaluate(expr: Expr): Object | null {

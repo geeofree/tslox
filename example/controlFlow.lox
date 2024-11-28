@@ -1,0 +1,9 @@
+let a = false
+let b = nil
+print not b and b
+
+if (a or b) {
+  print "b is truthy"
+} else {
+  print "a and b are false"
+}
