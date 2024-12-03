@@ -2,13 +2,16 @@ import {
   AssignmentExpr,
   BinaryExpr,
   BlockStmt,
+  CallExpr,
   Expr,
   ExprStmt,
+  FuncDeclStmt,
   GroupingExpr,
   IfStmt,
   LiteralExpr,
   LogicalExpr,
   PrintStmt,
+  ReturnStmt,
   Stmt,
   UnaryExpr,
   VarDeclStmt,
@@ -44,6 +47,10 @@ export class Parser {
       return this.varDeclaration();
     }
 
+    if (this.match(TokenTypes.FUNC)) {
+      return this.funcDeclaration();
+    }
+
     return this.statement();
   }
 
@@ -56,6 +63,24 @@ export class Parser {
     }
 
     return new VarDeclStmt(name, initializer);
+  }
+
+  private funcDeclaration(): Stmt {
+    const name = this.consume(TokenTypes.IDENT, "Expected identifer for function declaration.");
+    this.consume(TokenTypes.O_PAREN, "Expected '(' after function declaration");
+    const params: Token[] = [];
+    if (!this.check(TokenTypes.C_PAREN)) {
+      do {
+        if (params.length >= 255) {
+          console.error("Can't have more than 255 parameters.");
+        }
+        params.push(this.consume(TokenTypes.IDENT, "Expected parameter name."));
+      } while (this.match(TokenTypes.COMMA))
+    }
+    this.consume(TokenTypes.C_PAREN, "Expected ')' after function parameters declaration");
+    this.consume(TokenTypes.O_BRACKET, "Expected '{' before function body");
+    const body = this.blockStatement();
+    return new FuncDeclStmt(name, params, body as BlockStmt);
   }
 
   private statement(): Stmt {
@@ -77,6 +102,10 @@ export class Parser {
 
     if (this.match(TokenTypes.WHILE)) {
       return this.whileStatement();
+    }
+
+    if (this.match(TokenTypes.RETURN)) {
+      return this.returnStatement();
     }
 
     return this.expressionStatement();
@@ -171,6 +200,16 @@ export class Parser {
     this.consume(TokenTypes.C_BRACKET, "Expected '}'");
 
     return new WhileStmt(condition, statements);
+  }
+
+  private returnStatement(): Stmt {
+    const keyword: Token = this.previous();
+    let value: Expr | null = null;
+    if (!this.check(TokenTypes.SEMICOLON)) {
+      value = this.expression();
+    }
+    this.consume(TokenTypes.SEMICOLON, "Expected ';' after return value");
+    return new ReturnStmt(keyword, value);
   }
 
   private expressionStatement(): Stmt {
@@ -277,7 +316,21 @@ export class Parser {
       return new UnaryExpr(operator, right);
     }
 
-    return this.primary();
+    return this.call();
+  }
+
+  private call(): Expr {
+    let expr: Expr = this.primary();
+
+    while (true) {
+      if (this.match(TokenTypes.O_PAREN)) {
+        expr = this.finishCall(expr);
+      } else {
+        break;
+      }
+    }
+
+    return expr;
   }
 
   private primary(): Expr {
@@ -304,6 +357,23 @@ export class Parser {
     }
 
     throw new Error('Invalid expression.');
+  }
+
+  private finishCall(callee: Expr): Expr {
+    const args: Expr[] = [];
+
+    if (!this.check(TokenTypes.C_PAREN)) {
+      do {
+        if (args.length >= 255) {
+          console.error("Can't have more than 255 arguments.");
+        }
+        args.push(this.expression());
+      } while (this.match(TokenTypes.COMMA));
+    }
+
+    const paren: Token = this.consume(TokenTypes.C_PAREN, "Expected ')' after arguments.");
+
+    return new CallExpr(callee, paren, args);
   }
 
   private match(...tokenTypes: TokenTypes[]): boolean {

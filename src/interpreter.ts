@@ -2,14 +2,17 @@ import {
   AssignmentExpr,
   BinaryExpr,
   BlockStmt,
+  CallExpr,
   Expr,
   ExprStmt,
   ExprVisitor,
+  FuncDeclStmt,
   GroupingExpr,
   IfStmt,
   LiteralExpr,
   LogicalExpr,
   PrintStmt,
+  ReturnStmt,
   Stmt,
   StmtVisitor,
   UnaryExpr,
@@ -19,14 +22,18 @@ import {
 } from "./grammar";
 import { Environment } from "./environment";
 import { TokenTypes } from "./token";
+import { ClockLoxCallable, LoxCallable, LoxFunction, Return } from "./types";
 
 export class Interpreter implements ExprVisitor, StmtVisitor {
   public statements: Stmt[];
+  public globals: Environment;
   public environment: Environment;
 
   constructor(statements: Stmt[]) {
     this.statements = statements;
-    this.environment = new Environment();
+    this.globals = new Environment();
+    this.globals.set("clock", new ClockLoxCallable());
+    this.environment = this.globals;
   }
 
   interpret() {
@@ -136,6 +143,22 @@ export class Interpreter implements ExprVisitor, StmtVisitor {
     }
   }
 
+  visitCallExpr(expr: CallExpr): Object | null {
+    const callee = this.evaluate(expr.callee);
+    const args: Array<Object | null> = expr.arguments?.map(arg => this.evaluate(arg)) ?? [];
+
+    if (!(callee instanceof LoxCallable)) {
+      throw new Error("Can only call functions and classes.");
+    }
+
+    const func: LoxCallable = callee as LoxCallable;
+
+    if (args.length !== func.arity()) {
+      throw new Error(`${expr.paren.type} Expected ${func.arity()} arguments but got ${args.length}.`);
+    }
+    return func.call(this, args);
+  }
+
   visitExprStmt(stmt: ExprStmt): Object | null {
     this.evaluate(stmt.expression);
     return null;
@@ -177,6 +200,21 @@ export class Interpreter implements ExprVisitor, StmtVisitor {
     }
   }
 
+  visitFuncDeclStmt(stmt: FuncDeclStmt): void {
+    if (stmt.name.literal) {
+      const func: LoxFunction = new LoxFunction(stmt, this.environment);
+      this.environment.set(stmt.name.literal, func);
+    }
+  }
+
+  visitReturnStmt(stmt: ReturnStmt): void {
+    let value: Object | null = null;
+    if (stmt.value !== null)  {
+      value = this.evaluate(stmt.value);
+    }
+    throw new Return(value);
+  }
+
   private evaluate(expr: Expr): Object | null {
     return expr.accept(this);
   }
@@ -185,7 +223,7 @@ export class Interpreter implements ExprVisitor, StmtVisitor {
     statement.accept(this);
   }
 
-  private executeBlock(statements: Stmt[], environment: Environment) {
+  public executeBlock(statements: Stmt[], environment: Environment) {
     const previousEnv: Environment = this.environment;
 
     this.environment = environment;

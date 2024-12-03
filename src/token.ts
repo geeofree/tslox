@@ -15,6 +15,7 @@ export const enum TokenTypes {
   LT = 'LT',
   GT = 'GT',
   SEMICOLON = 'SEMICOLON',
+  COMMA = 'COMMA',
 
   // BINARY
   PLUS_EQUALS = 'PLUS_EQUALS',
@@ -47,6 +48,7 @@ export const enum TokenTypes {
   FUNC = 'FUNC',
   IDENT = 'IDENT',
   PRINT = 'PRINT',
+  RETURN = 'RETURN',
 
   // LITERALS
   STRING = 'STRING',
@@ -70,6 +72,7 @@ export const KeywordMap: Record<string, TokenTypes> = {
   'let': TokenTypes.LET,
   'func': TokenTypes.FUNC,
   'print': TokenTypes.PRINT,
+  'return': TokenTypes.RETURN,
 }
 
 export type TokenConfig = {

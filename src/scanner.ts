@@ -58,6 +58,13 @@ export class Scanner {
         break;
       }
 
+      case ',': {
+        this.pushToken({ type: TokenTypes.COMMA });
+        this.head += 1;
+        this.tail = this.head;
+        break;
+      }
+
       case '.': {
         this.pushToken({ type: TokenTypes.DOT });
         this.head += 1;
@@ -233,6 +240,7 @@ export class Scanner {
   }
 
   private chompString(char: string) {
+    this.head += 1;
     let nextChar = this.advance();
     while (nextChar !== char && this.isNotEOF()) {
       if (nextChar === '\n') {
@@ -246,11 +254,11 @@ export class Scanner {
       throw new Error(`Unclosed string.`);
     }
 
-    this.advance();
     this.pushToken({
       type: TokenTypes.STRING,
       literal: this.getLiteral(),
     });
+    this.advance();
     this.head = this.tail;
     this.line = this.lineEnd;
   }

@@ -12,6 +12,7 @@ export abstract class ExprVisitor {
   abstract visitVarExpr(expr: VariableExpr): Object | null;
   abstract visitAssignmentExpr(expr: AssignmentExpr): Object | null;
   abstract visitLogicalExpr(expr: LogicalExpr): Object | null;
+  abstract visitCallExpr(expr: CallExpr): Object | null;
 }
 
 export abstract class Stmt {
@@ -25,6 +26,8 @@ export abstract class StmtVisitor {
   abstract visitBlockStmt(stmt: BlockStmt): void;
   abstract visitIfStmt(stmt: IfStmt): void;
   abstract visitWhileStmt(stmt: WhileStmt): void;
+  abstract visitFuncDeclStmt(stmt: FuncDeclStmt): void;
+  abstract visitReturnStmt(stmt: ReturnStmt): void;
 }
 
 export class BinaryExpr extends Expr {
@@ -130,6 +133,23 @@ export class LogicalExpr extends Expr {
   }
 }
 
+export class CallExpr extends Expr {
+  public callee: Expr;
+  public paren: Token;
+  public arguments: Expr[] | null;
+
+  constructor(callee: Expr, paren: Token, args: Expr[] | null) {
+    super();
+    this.callee = callee;
+    this.paren = paren;
+    this.arguments = args;
+  }
+
+  accept(visitor: ExprVisitor): Object | null {
+    return visitor.visitCallExpr(this);
+  }
+}
+
 export class ExprStmt extends Stmt {
   public expression: Expr;
 
@@ -213,5 +233,37 @@ export class WhileStmt extends Stmt {
 
   accept(visitor: StmtVisitor): void {
     visitor.visitWhileStmt(this);
+  }
+}
+
+export class FuncDeclStmt extends Stmt {
+  public name: Token;
+  public params: Token[];
+  public body: BlockStmt;
+
+  constructor(name: Token, params: Token[], body: BlockStmt) {
+    super();
+    this.name = name;
+    this.params = params;
+    this.body = body;
+  }
+
+  accept(visitor: StmtVisitor): void {
+    visitor.visitFuncDeclStmt(this);
+  }
+}
+
+export class ReturnStmt extends Stmt {
+  public keyword: Token;
+  public value: Expr | null;
+
+  constructor(keyword: Token, value: Expr | null) {
+    super();
+    this.keyword = keyword;
+    this.value= value;
+  }
+
+  accept(visitor: StmtVisitor): void {
+    visitor.visitReturnStmt(this);
   }
 }

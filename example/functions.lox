@@ -1,0 +1,38 @@
+func sayHi(first, last) {
+  print "Hi, " + first + " " + last + "!"
+}
+
+sayHi("dear", "reader")
+
+func add(a, b) {
+  return a + b;
+}
+
+print add(1, 2)
+
+func fib(n) {
+  if (n <= 1) {
+    return n;
+  }
+  return fib(n - 2) + fib(n - 1);
+}
+
+print fib(15)
+
+print clock()
+
+func makeCounter() {
+  let i = 0
+  func count() {
+    i = i + 1
+    print i
+  }
+  return count;
+}
+
+let counter = makeCounter()
+counter()
+counter()
+counter()
+counter()
+counter()
