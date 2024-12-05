@@ -21,23 +21,28 @@ import {
   WhileStmt,
 } from "./grammar";
 import { Environment } from "./environment";
-import { TokenTypes } from "./token";
+import { Token, TokenTypes } from "./token";
 import { ClockLoxCallable, LoxCallable, LoxFunction, Return } from "./callable";
+import { Resolver } from "./resolver";
 
 export class Interpreter implements ExprVisitor, StmtVisitor {
   public statements: Stmt[];
   public globals: Environment;
   public environment: Environment;
+  public locals: Map<Expr, number>;
 
   constructor(statements: Stmt[]) {
     this.statements = statements;
     this.globals = new Environment();
     this.globals.set("clock", new ClockLoxCallable());
     this.environment = this.globals;
+    this.locals = new Map();
   }
 
   interpret() {
     try {
+      const resolver = new Resolver(this);
+      resolver.resolve(this.statements);
       this.statements.forEach((statement) => {
         this.execute(statement);
       });
@@ -117,16 +122,18 @@ export class Interpreter implements ExprVisitor, StmtVisitor {
   }
 
   visitVarExpr(expr: VariableExpr): Object | null {
-    if (expr.name.literal) {
-      return this.environment.get(expr.name.literal);
-    }
-    return null;
+    return this.lookupVariable(expr.name, expr);
   }
 
   visitAssignmentExpr(expr: AssignmentExpr): Object | null {
     if (expr.name.literal) {
       const value = this.evaluate(expr.value);
-      this.environment.assign(expr.name.literal, value);
+      const distance = this.locals.get(expr);
+      if (distance) {
+        this.environment.assignAt(distance, expr.name.literal, value);
+      } else {
+        this.globals.assign(expr.name.literal, value);
+      }
       return value;
     }
 
@@ -220,6 +227,22 @@ export class Interpreter implements ExprVisitor, StmtVisitor {
       value = this.evaluate(stmt.value);
     }
     throw new Return(value);
+  }
+
+  resolve(expr: Expr, depth: number): void {
+    this.locals.set(expr, depth);
+  }
+
+  private lookupVariable(name: Token, expr: Expr): Object | null {
+    if (!name.literal) return null;
+
+    const distance = this.locals.get(expr);
+
+    if (distance) {
+      return this.environment.getAt(distance, name.literal);
+    } else {
+      return this.globals.get(name.literal);
+    }
   }
 
   private evaluate(expr: Expr): Object | null {

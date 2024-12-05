@@ -19,6 +19,10 @@ export class Environment {
     throw new Error(`Undefined variable: ${key}.`);
   }
 
+  getAt(distance: number, name: string): Object | null {
+    return this.ancestor(distance).values.get(name) ?? null;
+  }
+
   set(key: string, value: Object | null): void {
     this.values.set(key, value);
   }
@@ -33,5 +37,19 @@ export class Environment {
     }
 
     throw new Error(`Undefined variable: ${key}`);
+  }
+
+  assignAt(distance: number, key: string, value: Object | null): void {
+    this.ancestor(distance).values.set(key, value);
+  }
+
+  private ancestor(distance: number) {
+    let environment: Environment = this;
+    for (let i = 0; i < distance; i++) {
+      if (environment.enclosing) {
+        environment = environment.enclosing;
+      }
+    }
+    return environment;
   }
 }

@@ -60,3 +60,8 @@ export class Return extends Error {
     this.value = value;
   }
 }
+
+export const enum FunctionType {
+  NONE = "NONE",
+  FUNCTION = "FUNCTION",
+}
