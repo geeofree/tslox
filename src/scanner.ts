@@ -13,7 +13,7 @@ export class Scanner {
 
   constructor(fileContents: string) {
     this.fileContents = fileContents;
-    this.source = fileContents.split('');
+    this.source = fileContents.split("");
     this.head = 0;
     this.tail = 0;
     this.colStart = 0;
@@ -31,8 +31,8 @@ export class Scanner {
 
   private tokenize(): void {
     const char = this.currentChar();
-    switch(char) {
-      case '\n': {
+    switch (char) {
+      case "\n": {
         this.line += 1;
         this.lineEnd = this.line;
         this.head += 1;
@@ -41,93 +41,93 @@ export class Scanner {
         break;
       }
 
-      case '\t':
-      case ' ': {
+      case "\t":
+      case " ": {
         let nextChar = this.advance();
-        while (nextChar === ' ' || nextChar === '\t') {
+        while (nextChar === " " || nextChar === "\t") {
           nextChar = this.advance();
         }
         this.head = this.tail;
         break;
       }
 
-      case ';': {
+      case ";": {
         this.pushToken({ type: TokenTypes.SEMICOLON });
         this.head += 1;
         this.tail = this.head;
         break;
       }
 
-      case ',': {
+      case ",": {
         this.pushToken({ type: TokenTypes.COMMA });
         this.head += 1;
         this.tail = this.head;
         break;
       }
 
-      case '.': {
+      case ".": {
         this.pushToken({ type: TokenTypes.DOT });
         this.head += 1;
         this.tail = this.head;
         break;
       }
 
-      case '(': {
+      case "(": {
         this.pushToken({ type: TokenTypes.O_PAREN });
         this.head += 1;
         this.tail = this.head;
         break;
       }
 
-      case ')': {
+      case ")": {
         this.pushToken({ type: TokenTypes.C_PAREN });
         this.head += 1;
         this.tail = this.head;
         break;
       }
 
-      case '{': {
+      case "{": {
         this.pushToken({ type: TokenTypes.O_BRACKET });
         this.head += 1;
         this.tail = this.head;
         break;
       }
 
-      case '}': {
+      case "}": {
         this.pushToken({ type: TokenTypes.C_BRACKET });
         this.head += 1;
         this.tail = this.head;
         break;
       }
 
-      case '[': {
+      case "[": {
         this.pushToken({ type: TokenTypes.O_SBRACKET });
         this.head += 1;
         this.tail = this.head;
         break;
       }
 
-      case ']': {
+      case "]": {
         this.pushToken({ type: TokenTypes.C_SBRACKET });
         this.head += 1;
         this.tail = this.head;
         break;
       }
 
-      case '+': {
-        if (this.advance() === '=') {
+      case "+": {
+        if (this.advance() === "=") {
           this.pushToken({ type: TokenTypes.PLUS_EQUALS });
           this.head = this.tail + 1;
           this.tail = this.head;
         } else {
           this.pushToken({ type: TokenTypes.PLUS });
-          this.head = this.tail
+          this.head = this.tail;
         }
         break;
       }
 
-      case '-': {
-        if (this.advance() === '=') {
+      case "-": {
+        if (this.advance() === "=") {
           this.pushToken({ type: TokenTypes.MINUS_EQUALS });
           this.head = this.tail + 1;
           this.tail = this.head;
@@ -138,8 +138,8 @@ export class Scanner {
         break;
       }
 
-      case '*': {
-        if (this.advance() === '=') {
+      case "*": {
+        if (this.advance() === "=") {
           this.pushToken({ type: TokenTypes.STAR_EQUALS });
           this.head = this.tail + 1;
           this.tail = this.head;
@@ -150,8 +150,8 @@ export class Scanner {
         break;
       }
 
-      case '=': {
-        if (this.advance() === '=') {
+      case "=": {
+        if (this.advance() === "=") {
           this.pushToken({ type: TokenTypes.EQUALS_EQUALS });
           this.head = this.tail + 1;
           this.tail = this.head;
@@ -162,8 +162,8 @@ export class Scanner {
         break;
       }
 
-      case '<': {
-        if (this.advance() === '=') {
+      case "<": {
+        if (this.advance() === "=") {
           this.pushToken({ type: TokenTypes.LTE });
           this.head = this.tail + 1;
           this.tail = this.head;
@@ -174,8 +174,8 @@ export class Scanner {
         break;
       }
 
-      case '>': {
-        if (this.advance() === '=') {
+      case ">": {
+        if (this.advance() === "=") {
           this.pushToken({ type: TokenTypes.GTE });
           this.head = this.tail + 1;
           this.tail = this.head;
@@ -186,10 +186,10 @@ export class Scanner {
         break;
       }
 
-      case '/': {
+      case "/": {
         switch (this.advance()) {
-          case '/': {
-            while (this.advance() !== '\n');
+          case "/": {
+            while (this.advance() !== "\n");
             this.pushToken({
               type: TokenTypes.SLASH_SLASH,
               literal: this.getLiteral(),
@@ -199,7 +199,7 @@ export class Scanner {
             break;
           }
 
-          case '=': {
+          case "=": {
             this.pushToken({ type: TokenTypes.SLASH_EQUALS });
             this.head = this.tail + 1;
             this.tail = this.head;
@@ -227,7 +227,7 @@ export class Scanner {
           break;
         }
 
-        if (char === '_' || this.isAlpha(char)) {
+        if (char === "_" || this.isAlpha(char)) {
           this.chompKeywordsOrIdentifiers();
           break;
         }
@@ -243,7 +243,7 @@ export class Scanner {
     this.head += 1;
     let nextChar = this.advance();
     while (nextChar !== char && this.isNotEOF()) {
-      if (nextChar === '\n') {
+      if (nextChar === "\n") {
         this.lineEnd += 1;
         this.colStart = this.tail - 1;
       }
@@ -264,19 +264,23 @@ export class Scanner {
   }
 
   private chompNumber() {
-    if (this.currentChar() === '0' && this.peek() !== '.' && this.isNumber(this.peek(2))) {
+    if (
+      this.currentChar() === "0" &&
+      this.peek() !== "." &&
+      this.isNumber(this.peek(2))
+    ) {
       // TODO: Provide row and column insights.
-      throw new Error('Not a valid number.');
+      throw new Error("Not a valid number.");
     }
 
     let hasDecimalAlready = false;
     let nextChar = this.advance();
 
-    while(this.isNumber(nextChar) || nextChar === '.') {
-      if (nextChar === '.') {
+    while (this.isNumber(nextChar) || nextChar === ".") {
+      if (nextChar === ".") {
         if (hasDecimalAlready) {
           // TODO: Provide row and column insights.
-          throw new Error('Not a valid number.');
+          throw new Error("Not a valid number.");
         } else {
           hasDecimalAlready = true;
         }
@@ -292,7 +296,7 @@ export class Scanner {
   }
 
   private chompKeywordsOrIdentifiers(): void {
-    while(this.isAlphaNumeric(this.advance()));
+    while (this.isAlphaNumeric(this.advance()));
     let keywordToken = KeywordMap[this.getLiteral()];
 
     if (keywordToken) {
@@ -300,7 +304,7 @@ export class Scanner {
     } else {
       this.pushToken({ type: TokenTypes.IDENT, literal: this.getLiteral() });
     }
-    this.head = this.tail
+    this.head = this.tail;
   }
 
   private advance(): string {
@@ -309,7 +313,9 @@ export class Scanner {
   }
 
   private peek(accumulator?: number): string {
-    return this.source[this.head + (typeof accumulator === "number" ? accumulator : 1)];
+    return this.source[
+      this.head + (typeof accumulator === "number" ? accumulator : 1)
+    ];
   }
 
   private currentChar(): string {
@@ -329,19 +335,27 @@ export class Scanner {
   }
 
   private pushToken(token: Optional<TokenConfig, "literal" | "row" | "col">) {
-    this.tokens.push(new Token({
-      type: token.type,
-      literal: token.literal ?? null,
-      row: token.row ?? [this.line, this.lineEnd],
-      col: token.col ?? [this.head - this.colStart, this.tail - this.colStart],
-    }));
+    this.tokens.push(
+      new Token({
+        type: token.type,
+        literal: token.literal ?? null,
+        row: token.row ?? [this.line, this.lineEnd],
+        col: token.col ?? [
+          this.head - this.colStart,
+          this.tail - this.colStart,
+        ],
+      }),
+    );
   }
 
   private getLiteral(): string {
-    return this.source.slice(this.head, this.tail).join('');
+    return this.source.slice(this.head, this.tail).join("");
   }
 
   private isNotEOF(): boolean {
-    return this.tail < this.fileContents.length && this.head < this.fileContents.length;
+    return (
+      this.tail < this.fileContents.length &&
+      this.head < this.fileContents.length
+    );
   }
 }

@@ -4,7 +4,10 @@ import { Interpreter } from "./interpreter";
 
 export abstract class LoxCallable {
   abstract arity(): number;
-  abstract call(interpreter: Interpreter, args: Array<Object | null>): Object | null;
+  abstract call(
+    interpreter: Interpreter,
+    args: Array<Object | null>,
+  ): Object | null;
 }
 
 export class ClockLoxCallable extends LoxCallable {
@@ -40,8 +43,7 @@ export class LoxFunction extends LoxCallable {
     });
     try {
       interpreter.executeBlock(this.declaration.body.statements, environment);
-    }
-    catch (error: unknown) {
+    } catch (error: unknown) {
       if (error instanceof Return) {
         return error.value;
       }

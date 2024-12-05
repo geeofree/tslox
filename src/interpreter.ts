@@ -38,7 +38,7 @@ export class Interpreter implements ExprVisitor, StmtVisitor {
 
   interpret() {
     try {
-      this.statements.forEach(statement => {
+      this.statements.forEach((statement) => {
         this.execute(statement);
       });
     } catch (error) {
@@ -63,7 +63,11 @@ export class Interpreter implements ExprVisitor, StmtVisitor {
     const left = this.evaluate(expr.left);
     const right = this.evaluate(expr.right);
 
-    if (typeof left === "string" && typeof right === "string" && expr.operator.type === TokenTypes.PLUS) {
+    if (
+      typeof left === "string" &&
+      typeof right === "string" &&
+      expr.operator.type === TokenTypes.PLUS
+    ) {
       return left + right;
     }
 
@@ -139,13 +143,14 @@ export class Interpreter implements ExprVisitor, StmtVisitor {
       case TokenTypes.AND:
         return this.isTruthy(left) && this.isTruthy(right);
       default:
-        return false
+        return false;
     }
   }
 
   visitCallExpr(expr: CallExpr): Object | null {
     const callee = this.evaluate(expr.callee);
-    const args: Array<Object | null> = expr.arguments?.map(arg => this.evaluate(arg)) ?? [];
+    const args: Array<Object | null> =
+      expr.arguments?.map((arg) => this.evaluate(arg)) ?? [];
 
     if (!(callee instanceof LoxCallable)) {
       throw new Error("Can only call functions and classes.");
@@ -154,7 +159,9 @@ export class Interpreter implements ExprVisitor, StmtVisitor {
     const func: LoxCallable = callee as LoxCallable;
 
     if (args.length !== func.arity()) {
-      throw new Error(`${expr.paren.type} Expected ${func.arity()} arguments but got ${args.length}.`);
+      throw new Error(
+        `${expr.paren.type} Expected ${func.arity()} arguments but got ${args.length}.`,
+      );
     }
     return func.call(this, args);
   }
@@ -209,7 +216,7 @@ export class Interpreter implements ExprVisitor, StmtVisitor {
 
   visitReturnStmt(stmt: ReturnStmt): void {
     let value: Object | null = null;
-    if (stmt.value !== null)  {
+    if (stmt.value !== null) {
       value = this.evaluate(stmt.value);
     }
     throw new Return(value);
@@ -239,6 +246,6 @@ export class Interpreter implements ExprVisitor, StmtVisitor {
 
   private isTruthy(object: Object | null) {
     if (object === null || object === false) return false;
-    return true
+    return true;
   }
 }

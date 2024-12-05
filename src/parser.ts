@@ -55,7 +55,10 @@ export class Parser {
   }
 
   private varDeclaration(): Stmt {
-    const name = this.consume(TokenTypes.IDENT, "Variable declaration must have identifier.");
+    const name = this.consume(
+      TokenTypes.IDENT,
+      "Variable declaration must have identifier.",
+    );
 
     let initializer: Expr | null = null;
     if (this.match(TokenTypes.EQUALS)) {
@@ -66,7 +69,10 @@ export class Parser {
   }
 
   private funcDeclaration(): Stmt {
-    const name = this.consume(TokenTypes.IDENT, "Expected identifer for function declaration.");
+    const name = this.consume(
+      TokenTypes.IDENT,
+      "Expected identifer for function declaration.",
+    );
     this.consume(TokenTypes.O_PAREN, "Expected '(' after function declaration");
     const params: Token[] = [];
     if (!this.check(TokenTypes.C_PAREN)) {
@@ -75,9 +81,12 @@ export class Parser {
           console.error("Can't have more than 255 parameters.");
         }
         params.push(this.consume(TokenTypes.IDENT, "Expected parameter name."));
-      } while (this.match(TokenTypes.COMMA))
+      } while (this.match(TokenTypes.COMMA));
     }
-    this.consume(TokenTypes.C_PAREN, "Expected ')' after function parameters declaration");
+    this.consume(
+      TokenTypes.C_PAREN,
+      "Expected ')' after function parameters declaration",
+    );
     this.consume(TokenTypes.O_BRACKET, "Expected '{' before function body");
     const body = this.blockStatement();
     return new FuncDeclStmt(name, params, body as BlockStmt);
@@ -163,7 +172,7 @@ export class Parser {
     }
     this.consume(TokenTypes.SEMICOLON, "Expected ';' after loop condition.");
 
-    let increment:  Expr | null = null;
+    let increment: Expr | null = null;
     if (!this.check(TokenTypes.C_PAREN)) {
       increment = this.expression();
     }
@@ -276,7 +285,9 @@ export class Parser {
   private comparison(): Expr {
     let expr: Expr = this.term();
 
-    while (this.match(TokenTypes.GT, TokenTypes.GTE, TokenTypes.LT, TokenTypes.LTE)) {
+    while (
+      this.match(TokenTypes.GT, TokenTypes.GTE, TokenTypes.LT, TokenTypes.LTE)
+    ) {
       const operator: Token = this.previous();
       const right: Expr = this.term();
       expr = new BinaryExpr(expr, operator, right);
@@ -286,21 +297,21 @@ export class Parser {
   }
 
   private term(): Expr {
-    let expr = this.factor()
+    let expr = this.factor();
 
-    while(this.match(TokenTypes.PLUS, TokenTypes.MINUS)) {
+    while (this.match(TokenTypes.PLUS, TokenTypes.MINUS)) {
       const operator: Token = this.previous();
       const right: Expr = this.factor();
       expr = new BinaryExpr(expr, operator, right);
     }
 
-    return expr
+    return expr;
   }
 
   private factor(): Expr {
     let expr = this.unary();
 
-    while(this.match(TokenTypes.STAR, TokenTypes.SLASH)) {
+    while (this.match(TokenTypes.STAR, TokenTypes.SLASH)) {
       const operator: Token = this.previous();
       const right: Expr = this.unary();
       expr = new BinaryExpr(expr, operator, right);
@@ -356,7 +367,7 @@ export class Parser {
       return new GroupingExpr(expr);
     }
 
-    throw new Error('Invalid expression.');
+    throw new Error("Invalid expression.");
   }
 
   private finishCall(callee: Expr): Expr {
@@ -371,7 +382,10 @@ export class Parser {
       } while (this.match(TokenTypes.COMMA));
     }
 
-    const paren: Token = this.consume(TokenTypes.C_PAREN, "Expected ')' after arguments.");
+    const paren: Token = this.consume(
+      TokenTypes.C_PAREN,
+      "Expected ')' after arguments.",
+    );
 
     return new CallExpr(callee, paren, args);
   }

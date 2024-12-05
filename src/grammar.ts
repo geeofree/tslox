@@ -42,7 +42,7 @@ export class BinaryExpr extends Expr {
     this.right = right;
   }
 
-  accept(visitor: ExprVisitor): Object | null{
+  accept(visitor: ExprVisitor): Object | null {
     return visitor.visitBinaryExpr(this);
   }
 }
@@ -260,7 +260,7 @@ export class ReturnStmt extends Stmt {
   constructor(keyword: Token, value: Expr | null) {
     super();
     this.keyword = keyword;
-    this.value= value;
+    this.value = value;
   }
 
   accept(visitor: StmtVisitor): void {
