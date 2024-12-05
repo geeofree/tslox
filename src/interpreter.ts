@@ -22,7 +22,7 @@ import {
 } from "./grammar";
 import { Environment } from "./environment";
 import { TokenTypes } from "./token";
-import { ClockLoxCallable, LoxCallable, LoxFunction, Return } from "./types";
+import { ClockLoxCallable, LoxCallable, LoxFunction, Return } from "./callable";
 
 export class Interpreter implements ExprVisitor, StmtVisitor {
   public statements: Stmt[];
